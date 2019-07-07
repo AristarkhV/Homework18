@@ -7,15 +7,18 @@ import org.h2.jdbcx.JdbcDataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DBService {
     private final Connection connection;
+    private static final Logger LOGGER = Logger.getLogger(DBService.class.getName());
 
-    public DBService() {
+    public DBService() throws SQLException {
         connection = getH2Connection();
     }
 
-    public static Connection getH2Connection() {
+    public static Connection getH2Connection() throws SQLException {
         try {
             String url = "jdbc:h2:./h2db";
             String name = "tully";
@@ -29,16 +32,16 @@ public class DBService {
             Connection connection = DriverManager.getConnection(url, name, pass);
             return connection;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed connect", e);
         }
-        return null;
+        throw new SQLException();
     }
 
     public UserProfile getUser(String login) throws SQLException {
         return new UserProfileDao(connection).get(login);
     }
 
-    public long addUser(String name, String password) throws DBException {
+    public long addUser(String name, String password) throws SQLException {
         try {
             connection.setAutoCommit(false);
             UserProfileDao dao = new UserProfileDao(connection);
@@ -50,15 +53,16 @@ public class DBService {
             try {
                 connection.rollback();
             } catch (SQLException ex) {
+                LOGGER.log(Level.SEVERE, "Failed connect ", e);
             }
-            throw new DBException(e);
         } finally {
             try {
                 connection.setAutoCommit(true);
             } catch (SQLException e) {
-
+                LOGGER.log(Level.SEVERE, "Failed connect ", e);
             }
         }
+        throw new SQLException();
     }
 
     public void printConnectInfo() {
@@ -68,7 +72,7 @@ public class DBService {
             System.out.println("Driver: " + connection.getMetaData().getDriverName());
             System.out.println("Autocommit: " + connection.getAutoCommit());
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed print connect ", e);
         }
     }
 }
