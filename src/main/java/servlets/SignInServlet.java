@@ -22,21 +22,12 @@ public class SignInServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String login = request.getParameter("login");
-        String password = request.getParameter("password");
-        UserProfile user = null;
-        try {
-            user = dbService.getUser(login);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (Objects.isNull(user)) {
-            response.getWriter().println("Unauthorized");
+        if (accountService.getUserByLogin(request.getParameter("login")) != null) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write("Authorized: " + request.getParameter("login"));
+        } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        } else if (password.equals(user.getPassword())) {
-            response.getWriter().print("Authorized: " + login);
-            response.getWriter().print(HttpServletResponse.SC_OK);
+            response.getWriter().println("unauthorized");
         }
     }
 }
