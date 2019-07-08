@@ -19,17 +19,10 @@ public class SignUpServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             {
-        String login = request.getParameter("login");
-        String password = request.getParameter("password");
-
-        UserProfile newUser = new UserProfile(login, password);
-        try {
-            dbService.addUser(login, password);
-        } catch (DBException e) {
-            e.printStackTrace();
-        }
-
-        response.setContentType("text/html;charset=utf-8");
+                accountService.addNewUser(new UserProfile(
+                request.getParameter("login"),
+                "password",
+                "email"));
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }
