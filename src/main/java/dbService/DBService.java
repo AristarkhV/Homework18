@@ -19,17 +19,16 @@ public class DBService {
     }
 
     public static Connection getH2Connection() throws SQLException {
+            static final String URL = "jdbc:h2:./h2db";
+            static final String NAME = "tully";
+            static final String PASSWORD = "tully";
         try {
-            String url = "jdbc:h2:./h2db";
-            String name = "tully";
-            String pass = "tully";
+            JdbcDataSource dataSource = new JdbcDataSource();
+            dataSource.setURL(URL);
+            dataSource.setUser(NAME);
+            dataSource.setPassword(PASSWORD);
 
-            JdbcDataSource ds = new JdbcDataSource();
-            ds.setURL(url);
-            ds.setUser(name);
-            ds.setPassword(pass);
-
-            Connection connection = DriverManager.getConnection(url, name, pass);
+            Connection connection = DriverManager.getConnection(URL, NAME, PASSWORD);
             return connection;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Failed connect", e);
@@ -59,7 +58,7 @@ public class DBService {
             try {
                 connection.setAutoCommit(true);
             } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Failed connect ", e);
+                LOGGER.log(Level.SEVERE, "Failed user addition ", e);
             }
         }
         throw new SQLException();
